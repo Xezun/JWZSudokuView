@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TableViewCell" rowHeight="122" id="KGk-i7-Jjw" customClass="TableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="390" height="122"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="390" height="121.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" placeholderIntrinsicWidth="355" placeholderIntrinsicHeight="101" translatesAutoresizingMaskIntoConstraints="NO" id="Qq5-OV-nBf" customClass="JWZSudokuView">
+                        <rect key="frame" x="10" y="10" width="200" height="101"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="200" id="FFZ-Dn-FGK"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ns9-sc-INU">
+                        <rect key="frame" x="344.5" y="10" width="35.5" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Qq5-OV-nBf" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="5bQ-Vj-9G9"/>
+                    <constraint firstItem="Qq5-OV-nBf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="A36-4d-PyA"/>
+                    <constraint firstItem="Ns9-sc-INU" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="Vfi-Tt-TLr"/>
+                    <constraint firstAttribute="trailing" secondItem="Ns9-sc-INU" secondAttribute="trailing" constant="10" id="XBb-RJ-IJP"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="label" destination="Ns9-sc-INU" id="00a-nJ-wDm"/>
+                <outlet property="sudokuView" destination="Qq5-OV-nBf" id="MB4-uI-hgw"/>
+            </connections>
+            <point key="canvasLocation" x="256" y="153"/>
+        </tableViewCell>
+    </objects>
+</document>
