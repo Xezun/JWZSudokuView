@@ -49,7 +49,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 10;
+    return _dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -60,7 +60,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CGFloat sodukuViewHeight = [JWZSudokuView heightForContentImageCount:indexPath.row totalWidth:200 separator:2];
+    CGFloat sodukuViewHeight = [JWZSudokuView heightForContentImageCount:indexPath.row totalWidth:200 separator:2 aspectRatio:1.25];
     if (sodukuViewHeight == 0) {
         return 40;
     }

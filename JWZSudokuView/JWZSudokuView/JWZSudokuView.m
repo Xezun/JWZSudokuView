@@ -29,19 +29,36 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 @implementation JWZSudokuView
 
++ (CGFloat)widthWithTotalWith:(CGFloat)totalWidth separator:(CGFloat)separator {
+    return (totalWidth - separator * 2) / 3.0;
+}
+
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
-   return [self heightForContentImageCount:count width:((totalWidth - separator * 2) / 3.0) separator:separator];
+   return [self heightForContentImageCount:count width:[self widthWithTotalWith:totalWidth separator:separator] separator:separator aspectRatio:1.0];
+}
+
++ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
+    return [self heightForContentImageCount:count width:[self widthWithTotalWith:totalWidth separator:separator] separator:separator aspectRatio:aspectRatio];
 }
 
 + (CGFloat)heightForContentImageCount:(NSUInteger)count width:(CGFloat)width separator:(CGFloat)separator {
-    NSInteger totalRow = ceil(count / 3.0); // 进位取整，总行数
-    return (totalRow > 0 ? ((totalRow) * (width + separator) - separator) : 0);
+    return [self heightForContentImageCount:count width:width separator:separator aspectRatio:1.0];
+}
+
++ (CGFloat)heightForContentImageCount:(NSUInteger)count width:(CGFloat)width separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
+    NSInteger totalRow = ceil(MIN(9, count) / 3.0); // 进位取整，总行数
+    return (totalRow > 0 ? ((totalRow) * (width / aspectRatio + separator) - separator) : 0);
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
+    return [self initWithFrame:frame aspectRatio:1.0];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame aspectRatio:(CGFloat)aspectRatio {
     self = [super initWithFrame:frame];
     if (self != nil) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+        _aspectRatio = aspectRatio;
     }
     return self;
 }
@@ -139,8 +156,9 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     [_wrapperView addConstraint:leading];
     objc_setAssociatedObject(imageView, kJWZSudokuViewLeadingConstraintToken, leading, OBJC_ASSOCIATION_RETAIN);
     
-    NSLayoutConstraint *aspectRatio = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeWidth) relatedBy:(NSLayoutRelationEqual) toItem:imageView attribute:(NSLayoutAttributeHeight) multiplier:1 constant:0];
+    NSLayoutConstraint *aspectRatio = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeWidth) relatedBy:(NSLayoutRelationEqual) toItem:imageView attribute:(NSLayoutAttributeHeight) multiplier:_aspectRatio constant:0];
     [imageView addConstraint:aspectRatio];
+    
     NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeWidth) relatedBy:(NSLayoutRelationEqual) toItem:nil attribute:(NSLayoutAttributeNotAnAttribute) multiplier:1.0 constant:0];
     [imageView addConstraint:width];
     objc_setAssociatedObject(imageView, kJWZSudokuViewWidthConstraintToken, width, OBJC_ASSOCIATION_RETAIN);
@@ -149,6 +167,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 // 创建需要显示的内容
 - (void)setContentWithCount:(NSInteger)newContentCount {
+    newContentCount = MIN(9, newContentCount);
     NSInteger oldContentCount = self.contentViews.count;
     if (oldContentCount < newContentCount) {
         for (NSInteger i = oldContentCount; i < newContentCount; i ++) {
@@ -198,15 +217,16 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 - (void)layoutImageViews {
     CGFloat width = (self.bounds.size.width - self.separator * 2) / 3;
+    CGFloat height = width / _aspectRatio;
     NSInteger count = _contentViews.count;
-    self.wrapperHeightConstraint.constant = [[self class] heightForContentImageCount:count width:width separator:_separator];
+    self.wrapperHeightConstraint.constant = [[self class] heightForContentImageCount:count width:width separator:_separator aspectRatio:_aspectRatio];
     NSInteger rowSize = (count == 4 ? 2 : 3); // 四个的时候，显示田字格，其余的时候显示九宫格
     [_contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         obj.tag = idx;
         NSInteger row = idx / rowSize;
         NSInteger col = idx % rowSize;
         NSLayoutConstraint *constraint = objc_getAssociatedObject(obj, kJWZSudokuViewTopConstraintToken);
-        constraint.constant = (width + _separator) * row;
+        constraint.constant = (height  + _separator) * row;
         constraint = objc_getAssociatedObject(obj, kJWZSudokuViewWidthConstraintToken);
         constraint.constant = width;
         constraint = objc_getAssociatedObject(obj, kJWZSudokuViewLeadingConstraintToken);

@@ -16,9 +16,15 @@
                 <subviews>
                     <view contentMode="scaleToFill" placeholderIntrinsicWidth="355" placeholderIntrinsicHeight="101" translatesAutoresizingMaskIntoConstraints="NO" id="Qq5-OV-nBf" customClass="JWZSudokuView">
                         <rect key="frame" x="10" y="10" width="200" height="101"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="200" id="FFZ-Dn-FGK"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="aspectRatio">
+                                <real key="value" value="1.25"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ns9-sc-INU">
                         <rect key="frame" x="344.5" y="10" width="35.5" height="17"/>
