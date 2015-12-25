@@ -23,7 +23,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 @property (nonatomic, strong) JWZSudokuWrapperView *wrapperView;                    // 容器视图
 @property (nonatomic, weak) NSLayoutConstraint *wrapperHeightConstraint;            // 容器视图的高度约束
 @property (nonatomic, strong) NSMutableArray<UIImageView *> *contentViews;          // 正在显示的图片
-@property (nonatomic, strong) NSMutableArray<UIImageView *> *reusableContentViews;    // 重用池
+@property (nonatomic, strong) NSMutableArray<UIImageView *> *reusableContentViews;  // 重用池
 
 @end
 
@@ -81,21 +81,24 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     [self addSubview:_wrapperView];
     
     _wrapperView.translatesAutoresizingMaskIntoConstraints = NO;
+    
     // 水平与父视图相等
     NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_wrapperView]|" options:(NSLayoutFormatAlignAllLeft) metrics:nil views:NSDictionaryOfVariableBindings(_wrapperView)];
     [self addConstraints:constraints];
+    
     // 顶部与父视图相等
     NSLayoutConstraint *constraint1 = [NSLayoutConstraint constraintWithItem:_wrapperView attribute:(NSLayoutAttributeTop) relatedBy:(NSLayoutRelationEqual) toItem:self attribute:(NSLayoutAttributeTop) multiplier:1.0 constant:0];
     [self addConstraint:constraint1];
+    
     // 高度与父视图相等
     NSLayoutConstraint *constraint2 = [NSLayoutConstraint constraintWithItem:_wrapperView attribute:(NSLayoutAttributeHeight) relatedBy:(NSLayoutRelationEqual) toItem:self attribute:(NSLayoutAttributeHeight) multiplier:1.0 constant:0];
     constraint2.priority = 500;
+    [self addConstraint:constraint2];
+    
     // 高度的约束，默认 0
     NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:_wrapperView attribute:(NSLayoutAttributeHeight) relatedBy:(NSLayoutRelationEqual) toItem:nil attribute:(NSLayoutAttributeNotAnAttribute) multiplier:1.0 constant:0];
     [_wrapperView addConstraint:height];
     _wrapperHeightConstraint = height;
-    
-    [self addConstraint:constraint2];
     
     return _wrapperView;
 }
