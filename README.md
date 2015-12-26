@@ -36,7 +36,7 @@ nextView.frame = CGRectMake(CGRectGetMinX(sudokuView.frame),
 
 ```
 
-#### Creating an Upload Task
+#### AutoLayout 布局使用
 
 ```objective-c
 #import "JWZSudokuView.h"
