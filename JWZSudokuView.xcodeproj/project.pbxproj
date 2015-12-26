@@ -83,6 +83,7 @@
 		AFB5D00E1C2DC2BB00BE2E0B /* TableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
 		AFB5D00F1C2DC2BB00BE2E0B /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 		AFB5D0101C2DC2BB00BE2E0B /* TableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
+		AFB5D01C1C2E815900BE2E0B /* JWZSudokuViewModelRTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JWZSudokuViewModelRTF.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +187,7 @@
 			children = (
 				AFB5D00B1C2DB5EF00BE2E0B /* JWZSudokuView.h */,
 				AFB5D00C1C2DB5EF00BE2E0B /* JWZSudokuView.m */,
+				AFB5D01C1C2E815900BE2E0B /* JWZSudokuViewModelRTF.h */,
 			);
 			path = JWZSudokuView;
 			sourceTree = "<group>";

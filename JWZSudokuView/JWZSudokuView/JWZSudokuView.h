@@ -53,12 +53,3 @@
 - (void)sudokuView:(JWZSudokuView *)sudokuView didTouchOnImageView:(UIImageView *)imageView atIndex:(NSInteger)index;
 
 @end
-
-// 这个实际上是 KVC ，告诉 JWZSudokuView 从 Model 的哪个属性中取值
-@protocol JWZSudokuViewModelRTF <NSObject>
-
-@required
-- (NSString *)imageUrlKey;
-- (id)valueForKey:(NSString *)key;
-
-@end

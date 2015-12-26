@@ -8,6 +8,7 @@
 
 #import <objc/runtime.h>
 #import "JWZSudokuView.h"
+#import "JWZSudokuViewModelRTF.h"
 #import "UIImageView+WebCache.h"
 
 static void const *const kJWZSudokuViewWidthConstraintToken = &kJWZSudokuViewWidthConstraintToken;
