@@ -8,6 +8,11 @@
 - 2，JWZSudokuView 需要 SDWebImage 组件支持，如果你的工程没有引入该组件，请引入该组件。Demo 中已提供了一个版本，但可能不是最新的。
 - 3，引入头文件 JWZSudokuView.h 然后你就可以使用了。
 
+## Demo截图
+
+![Demo截图1](JWZSudokuView/1.png "Demo截图1")
+![Demo截图12](JWZSudokuView/2.png "Demo截图2")
+
 #### 在普通布局中使用
 
 ```objective-c
