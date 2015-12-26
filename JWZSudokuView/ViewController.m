@@ -38,6 +38,31 @@
                    @"http://img4.duitang.com/uploads/item/201409/16/20140916103123_343c3.jpeg",
                    @"http://v1.qzone.cc/avatar/201407/25/20/52/53d253192be47412.jpg%21200x200.jpg"
                    ];
+    
+
+    UIView *superView = self.view;
+
+    JWZSudokuView *sudokuView = [[JWZSudokuView alloc] init];
+    [superView addSubview:sudokuView];
+    
+    sudokuView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSArray *constraints1 = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[sudokuView]|" options:(NSLayoutFormatAlignAllLeft) metrics:nil views:NSDictionaryOfVariableBindings(sudokuView)];
+    [superView addConstraints:constraints1];
+    
+    // 你不需要制定 sudokuView 的高度约束和底边约束，因为它会自动扩大；如果是 xib ，设置 placeholder 的即可
+    NSArray *constraints2 = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[sudokuView]" options:(NSLayoutFormatAlignAllLeft) metrics:nil views:NSDictionaryOfVariableBindings(sudokuView)];
+    [superView addConstraints:constraints2];
+    
+    [self.view addSubview:sudokuView];
+    
+//    [sudokuView setContentWithImageUrls:_dataArray];
+//    sudokuView.frame = CGRectMake(10, 40, 200, 0);
+//    CGFloat height = [JWZSudokuView heightForContentImageCount:imageUrls.count totalWidth:200 separator:2];
+//    [sudokuView setContentWithImageUrls:imageUrls];
+//    
+//    UIView *nextView = [[UIView alloc] init];
+//    nextView.frame = CGRectMake(CGRectGetMinX(sudokuView.frame), CGRectGetMaxY(sudokuView.frame) + height, CGRectGetWidth(sudokuView.frame), CGRectGetHeight(sudokuView.frame));
+    
 }
 
 - (void)sudokuView:(JWZSudokuView *)sudokuView didTouchOnImageView:(UIImageView *)imageView atIndex:(NSInteger)index {

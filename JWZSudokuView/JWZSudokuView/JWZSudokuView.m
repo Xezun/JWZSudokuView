@@ -136,6 +136,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 // 把 ImageView 加入重用池
 - (void)queueReusableContentView:(UIImageView *)imageView {
     imageView.hidden = YES;
+    imageView.image = nil;
     [self.reusableContentViews addObject:imageView];
 }
 
@@ -266,12 +267,11 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 */
 
 - (void)didReceiveMemoryWarning {
-    NSInteger count = [_reusableContentViews count];
-    for (NSInteger i = count - 1; i > - 1; i --) {
-        UIImageView *imageView = [_reusableContentViews objectAtIndex:i];
-        [_reusableContentViews removeObjectAtIndex:i];
-        [imageView removeFromSuperview];
-    }
+    NSArray *array = _reusableContentViews;
+    _reusableContentViews = nil;
+    [array enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj removeFromSuperview];
+    }];
 }
 
 @end
