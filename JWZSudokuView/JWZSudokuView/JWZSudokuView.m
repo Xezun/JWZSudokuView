@@ -81,6 +81,22 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self != nil) {
+        _aspectRatio = [[aDecoder decodeObjectForKey:@"aspectRatio"] doubleValue];
+        if (_aspectRatio <= 0) {
+            _aspectRatio = [[self class] defaultAspectRatio];
+        }
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    [aCoder encodeObject:[NSNumber numberWithDouble:_aspectRatio] forKey:@"aspectRatio"];
+}
+
 #pragma mark - 属性
 
 - (CGFloat)separator {
@@ -289,11 +305,6 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     [array enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
     }];
-}
-
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    _aspectRatio = [[self class] defaultAspectRatio];
 }
 
 @end

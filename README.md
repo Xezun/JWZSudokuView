@@ -10,8 +10,8 @@
 
 ## Demo截图
 
-![JWZSudokuView/1.png](JWZSudokuView/1.png "Demo截图1")
-![JWZSudokuView/1.png](JWZSudokuView/2.png "Demo截图2")
+![Demo截图](JWZSudokuView/1.png "Demo截图1")
+![Demo截图](JWZSudokuView/2.png "Demo截图2")
 
 #### 在普通布局中使用
 
