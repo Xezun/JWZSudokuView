@@ -29,10 +29,12 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 @implementation JWZSudokuView
 
+// 计算每个小图的宽度
 + (CGFloat)widthWithTotalWith:(CGFloat)totalWidth separator:(CGFloat)separator {
     return (totalWidth - separator * 2) / 3.0;
 }
 
+// 计算整个视图的高度
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
    return [self heightForContentImageCount:count width:[self widthWithTotalWith:totalWidth separator:separator] separator:separator aspectRatio:1.0];
 }
@@ -220,7 +222,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 }
 
 - (void)layoutImageViews {
-    CGFloat width = (self.bounds.size.width - self.separator * 2) / 3;
+    CGFloat width = [[self class] widthWithTotalWith:self.bounds.size.width separator:self.separator];
     CGFloat height = width / _aspectRatio;
     NSInteger count = _contentViews.count;
     self.wrapperHeightConstraint.constant = [[self class] heightForContentImageCount:count width:width separator:_separator aspectRatio:_aspectRatio];
@@ -248,7 +250,6 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 - (NSArray<UIImageView *> *)allImageViews {
     return _contentViews;
 }
-
 
 // 点击图片的代理事件
 - (void)tapAction:(UITapGestureRecognizer *)tap {
