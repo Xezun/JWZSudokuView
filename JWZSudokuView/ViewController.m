@@ -19,6 +19,10 @@
 
 @implementation ViewController
 
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -60,7 +64,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CGFloat sodukuViewHeight = [JWZSudokuView heightForContentImageCount:indexPath.row totalWidth:200 separator:5 aspectRatio:1.25];
+    CGFloat sodukuViewHeight = [JWZSudokuView heightForContentImageCount:indexPath.row totalWidth:200];
     if (sodukuViewHeight == 0) {
         return 40;
     }

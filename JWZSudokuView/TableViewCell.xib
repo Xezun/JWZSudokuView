@@ -16,18 +16,10 @@
                 <subviews>
                     <view contentMode="scaleToFill" placeholderIntrinsicWidth="355" placeholderIntrinsicHeight="101" translatesAutoresizingMaskIntoConstraints="NO" id="Qq5-OV-nBf" customClass="JWZSudokuView">
                         <rect key="frame" x="10" y="10" width="200" height="101"/>
-                        <color key="backgroundColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="200" id="FFZ-Dn-FGK"/>
                         </constraints>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="number" keyPath="aspectRatio">
-                                <real key="value" value="1.25"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="number" keyPath="separator">
-                                <integer key="value" value="5"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ns9-sc-INU">
                         <rect key="frame" x="344.5" y="10" width="35.5" height="17"/>
@@ -36,13 +28,17 @@
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
+                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                 <constraints>
                     <constraint firstItem="Qq5-OV-nBf" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="5bQ-Vj-9G9"/>
                     <constraint firstItem="Qq5-OV-nBf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="A36-4d-PyA"/>
                     <constraint firstItem="Ns9-sc-INU" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="Vfi-Tt-TLr"/>
                     <constraint firstAttribute="trailing" secondItem="Ns9-sc-INU" secondAttribute="trailing" constant="10" id="XBb-RJ-IJP"/>
                 </constraints>
+                <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
             </tableViewCellContentView>
+            <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
+            <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
             <connections>
                 <outlet property="label" destination="Ns9-sc-INU" id="00a-nJ-wDm"/>
                 <outlet property="sudokuView" destination="Qq5-OV-nBf" id="MB4-uI-hgw"/>

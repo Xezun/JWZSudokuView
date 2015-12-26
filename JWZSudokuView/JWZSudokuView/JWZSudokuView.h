@@ -14,7 +14,8 @@
 
 @interface JWZSudokuView : UIView
 
-// 非 autoLayout 布局时，可以使用此方法获取高度
+// 非 autoLayout 布局时，可以使用以下方法获取高度
++ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)width;
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)width separator:(CGFloat)separator;
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)width separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio;
 
@@ -24,7 +25,7 @@
 // aspectRatio 是 宽/高 的值，默认 1.0。
 @property (nonatomic, readonly) CGFloat aspectRatio;
 
-// 图片间的间隔，默认 1.0 。
+// 图片间的间隔，默认 3.0 。
 @property (nonatomic) CGFloat separator;
 
 // 事件代理

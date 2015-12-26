@@ -32,6 +32,8 @@
 		AFB5D00D1C2DB5EF00BE2E0B /* JWZSudokuView.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB5D00C1C2DB5EF00BE2E0B /* JWZSudokuView.m */; };
 		AFB5D0111C2DC2BB00BE2E0B /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB5D00F1C2DC2BB00BE2E0B /* TableViewCell.m */; };
 		AFB5D0121C2DC2BB00BE2E0B /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFB5D0101C2DC2BB00BE2E0B /* TableViewCell.xib */; };
+		AFB5D0231C2EBF4900BE2E0B /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = AFB5D0211C2EBF4900BE2E0B /* 1.png */; };
+		AFB5D0241C2EBF4900BE2E0B /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = AFB5D0221C2EBF4900BE2E0B /* 2.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,6 +86,8 @@
 		AFB5D00F1C2DC2BB00BE2E0B /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 		AFB5D0101C2DC2BB00BE2E0B /* TableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
 		AFB5D01C1C2E815900BE2E0B /* JWZSudokuViewModelRTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JWZSudokuViewModelRTF.h; sourceTree = "<group>"; };
+		AFB5D0211C2EBF4900BE2E0B /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		AFB5D0221C2EBF4900BE2E0B /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +133,8 @@
 				AFB5CFC31C2DA6AB00BE2E0B /* Assets.xcassets */,
 				AFB5CFC51C2DA6AB00BE2E0B /* LaunchScreen.storyboard */,
 				AFB5CFC81C2DA6AB00BE2E0B /* Info.plist */,
+				AFB5D0211C2EBF4900BE2E0B /* 1.png */,
+				AFB5D0221C2EBF4900BE2E0B /* 2.png */,
 				AFB5CFB71C2DA6AB00BE2E0B /* Supporting Files */,
 			);
 			path = JWZSudokuView;
@@ -250,10 +256,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AFB5D0241C2EBF4900BE2E0B /* 2.png in Resources */,
 				AFB5CFC71C2DA6AB00BE2E0B /* LaunchScreen.storyboard in Resources */,
 				AFB5D0121C2DC2BB00BE2E0B /* TableViewCell.xib in Resources */,
 				AFB5CFC41C2DA6AB00BE2E0B /* Assets.xcassets in Resources */,
 				AFB5CFC21C2DA6AB00BE2E0B /* Main.storyboard in Resources */,
+				AFB5D0231C2EBF4900BE2E0B /* 1.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

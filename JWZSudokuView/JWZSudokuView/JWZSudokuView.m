@@ -30,31 +30,46 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 @implementation JWZSudokuView
 
++ (CGFloat)defaultSeparator {
+    return 3.0;
+}
+
++ (CGFloat)defaultAspectRatio {
+    return 1.0;
+}
+
++ (CGFloat)widthWithTotalWidth:(CGFloat)totalWidth {
+    return [self widthWithTotalWidth:totalWidth separator:[self defaultSeparator]];
+}
+
 // 计算每个小图的宽度
-+ (CGFloat)widthWithTotalWith:(CGFloat)totalWidth separator:(CGFloat)separator {
++ (CGFloat)widthWithTotalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
     return (totalWidth - separator * 2) / 3.0;
 }
 
-// 计算整个视图的高度
++ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth {
+    return [self heightForContentImageCount:count totalWidth:totalWidth separator:[self defaultSeparator]];
+}
+
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
-   return [self heightForContentImageCount:count width:[self widthWithTotalWith:totalWidth separator:separator] separator:separator aspectRatio:1.0];
+   return [self heightForContentImageCount:count totalWidth:totalWidth separator:separator aspectRatio:[self defaultAspectRatio]];
 }
 
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
-    return [self heightForContentImageCount:count width:[self widthWithTotalWith:totalWidth separator:separator] separator:separator aspectRatio:aspectRatio];
+    return [self heightForContentImageCount:count width:[self widthWithTotalWidth:totalWidth separator:separator] separator:separator aspectRatio:aspectRatio];
 }
 
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count width:(CGFloat)width separator:(CGFloat)separator {
-    return [self heightForContentImageCount:count width:width separator:separator aspectRatio:1.0];
-}
-
+// 计算整个视图的高度
 + (CGFloat)heightForContentImageCount:(NSUInteger)count width:(CGFloat)width separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
-    NSInteger totalRow = ceil(MIN(9, count) / 3.0); // 进位取整，总行数
-    return (totalRow > 0 ? ((totalRow) * (width / aspectRatio + separator) - separator) : 0);
+    if (count > 0) {
+        NSInteger totalRow = ceil(MIN(9, count) / 3.0); // 进位取整，总行数
+        return ((totalRow) * (width / aspectRatio + separator) - separator);
+    }
+    return 0;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
-    return [self initWithFrame:frame aspectRatio:1.0];
+    return [self initWithFrame:frame aspectRatio:[[self class] defaultAspectRatio]];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame aspectRatio:(CGFloat)aspectRatio {
@@ -72,7 +87,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     if (_separator > 0) {
         return _separator;
     }
-    _separator = 1.0;
+    _separator = [[self class] defaultSeparator];
     return _separator;
 }
 
@@ -223,7 +238,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 }
 
 - (void)layoutImageViews {
-    CGFloat width = [[self class] widthWithTotalWith:self.bounds.size.width separator:self.separator];
+    CGFloat width = [[self class] widthWithTotalWidth:self.bounds.size.width separator:self.separator];
     CGFloat height = width / _aspectRatio;
     NSInteger count = _contentViews.count;
     self.wrapperHeightConstraint.constant = [[self class] heightForContentImageCount:count width:width separator:_separator aspectRatio:_aspectRatio];
@@ -274,6 +289,11 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     [array enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
     }];
+}
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    _aspectRatio = [[self class] defaultAspectRatio];
 }
 
 @end
