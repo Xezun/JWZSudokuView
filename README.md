@@ -10,8 +10,8 @@
 
 ## Demo截图
 
-![Demo截图](JWZSudokuView/1.png "Demo截图1")
-![Demo截图](JWZSudokuView/2.png "Demo截图2")
+<img src="JWZSudokuView/1.png" width=375 height=667 alt="Demo截图"></img>
+<img src="JWZSudokuView/2.png" width=375 height=667 alt="Demo截图"></img>
 
 #### 在普通布局中使用
 
