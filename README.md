@@ -24,9 +24,14 @@ sudokuView.frame = CGRectMake(10, 40, 200, 0);
 [superView addSubview:sudokuView];
 
 // 如果你有另外一个视图，在 sodukuView 的下方，那么处理方法就类似如：（其它情况以此类推）
-CGFloat height = [JWZSudokuView heightForContentImageCount:imageUrls.count totalWidth:200 separator:2];
+CGFloat height = [JWZSudokuView heightForContentImageCount:imageUrls.count 
+                                                totalWidth:200 
+                                                 separator:2];
 UIView *nextView = [[UIView alloc] init];
-nextView.frame = CGRectMake(CGRectGetMinX(sudokuView.frame), CGRectGetMaxY(sudokuView.frame) + height, CGRectGetWidth(sudokuView.frame), CGRectGetHeight(sudokuView.frame));
+nextView.frame = CGRectMake(CGRectGetMinX(sudokuView.frame), 
+                            CGRectGetMaxY(sudokuView.frame) + height, 
+                            CGRectGetWidth(sudokuView.frame), 
+                            CGRectGetHeight(sudokuView.frame));
 [superView addSubview:nextView];
 
 ```
@@ -43,11 +48,17 @@ JWZSudokuView *sudokuView = [[JWZSudokuView alloc] init];
 [superView addSubview:sudokuView];
 
 sudokuView.translatesAutoresizingMaskIntoConstraints = NO;
-NSArray *constraints1 = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[sudokuView]|" options:(NSLayoutFormatAlignAllLeft) metrics:nil views:NSDictionaryOfVariableBindings(sudokuView)];
+NSArray *constraints1 = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[sudokuView]|" 
+                                                                options:(NSLayoutFormatAlignAllLeft) 
+                                                                metrics:nil 
+                                                                  views:NSDictionaryOfVariableBindings(sudokuView)];
 [superView addConstraints:constraints1];
 
 // 你不需要制定 sudokuView 的高度约束和底边约束，因为它会自动扩大；如果是 xib ，设置 placeholder 的即可
-NSArray *constraints2 = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[sudokuView]" options:(NSLayoutFormatAlignAllLeft) metrics:nil views:NSDictionaryOfVariableBindings(sudokuView)];
+NSArray *constraints2 = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[sudokuView]" 
+                                                                options:(NSLayoutFormatAlignAllLeft) 
+                                                                metrics:nil 
+                                                                 views:NSDictionaryOfVariableBindings(sudokuView)];
 [superView addConstraints:constraints2];
 
 [sudokuView setContentWithImageUrls:imageUrls];
