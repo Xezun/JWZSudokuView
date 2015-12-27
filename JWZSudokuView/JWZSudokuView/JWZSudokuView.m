@@ -170,7 +170,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 // 把 ImageView 加入重用池
 - (void)queueReusableContentView:(UIImageView *)imageView {
     imageView.hidden = YES;
-    imageView.image = nil;
+//    imageView.image = nil;
     [self.reusableContentViews addObject:imageView];
 }
 
