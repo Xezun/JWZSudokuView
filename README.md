@@ -10,10 +10,10 @@
 
 ## Demo截图
 
-<img src="JWZSudokuView/1.png" width=187.5 height=333.5 alt="Demo截图"></img>
-<img src="JWZSudokuView/2.png" width=187.5 height=333.5 alt="Demo截图"></img>
-<img src="JWZSudokuView/3.png" width=187.5 height=333.5 alt="Demo截图"></img>
-<img src="JWZSudokuView/4.png" width=187.5 height=333.5 alt="Demo截图"></img>
+<img src="JWZSudokuView/1.png" width=180 height=320 alt="Demo截图"></img>
+<img src="JWZSudokuView/2.png" width=180 height=320 alt="Demo截图"></img>
+<img src="JWZSudokuView/3.png" width=180 height=320 alt="Demo截图"></img>
+<img src="JWZSudokuView/4.png" width=180 height=320 alt="Demo截图"></img>
 
 #### 在普通布局中使用
 
