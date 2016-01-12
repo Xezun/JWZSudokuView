@@ -6,14 +6,14 @@
 //  Copyright © 2015年 J. W. Z. All rights reserved.
 //
 
-#import <objc/runtime.h>
 #import "JWZSudokuView.h"
-#import "JWZSudokuViewModelRTF.h"
+#import <objc/runtime.h>
 #import "UIImageView+WebCache.h"
 
-static void const *const kJWZSudokuViewWidthConstraintToken = &kJWZSudokuViewWidthConstraintToken;
-static void const *const kJWZSudokuViewLeadingConstraintToken = &kJWZSudokuViewLeadingConstraintToken;
-static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopConstraintToken;
+static void const *const kJWZSudokuViewWidthConstraintToken   = &kJWZSudokuViewWidthConstraintToken;// 宽度
+static void const *const kJWZSudokuViewHeightConstraintToken  = &kJWZSudokuViewHeightConstraintToken;// 高度
+static void const *const kJWZSudokuViewLeadingConstraintToken = &kJWZSudokuViewLeadingConstraintToken;// item 距左边
+static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewTopConstraintToken;// item 距右边
 
 @interface JWZSudokuWrapperView : UIView
 
@@ -21,52 +21,55 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 @interface JWZSudokuView ()
 
-@property (nonatomic, strong) JWZSudokuWrapperView *wrapperView;                    // 容器视图
-@property (nonatomic, weak) NSLayoutConstraint *wrapperHeightConstraint;            // 容器视图的高度约束
-@property (nonatomic, strong) NSMutableArray<UIImageView *> *contentViews;          // 正在显示的图片
-@property (nonatomic, strong) NSMutableArray<UIImageView *> *reusableContentViews;  // 重用池
+@property (nonatomic, strong) JWZSudokuWrapperView *wrapperView;// 容器视图
+@property (nonatomic, weak  ) NSLayoutConstraint   *wrapperHeightConstraint;// 容器视图的高度约束
+@property (nonatomic, strong) NSMutableArray<UIImageView *> *contentViews;// 正在显示的图片
+@property (nonatomic, strong) NSMutableArray<UIImageView *> *reusableContentViews;// 重用池
 
 @end
 
 @implementation JWZSudokuView
 
+#pragma mark - 类方法
+
+// 默认间距
 + (CGFloat)defaultSeparator {
     return 3.0;
 }
 
+// 默认宽高比
 + (CGFloat)defaultAspectRatio {
     return 1.0;
 }
 
-+ (CGFloat)widthWithTotalWidth:(CGFloat)totalWidth {
-    return [self widthWithTotalWidth:totalWidth separator:[self defaultSeparator]];
+// 默认间距下，每个小图的宽度
++ (CGFloat)itemWidthWithTotalWidth:(CGFloat)totalWidth itemCount:(NSUInteger)count {
+    return [self itemWidthWithTotalWidth:totalWidth itemCount:(NSUInteger)count separator:[self defaultSeparator]];
 }
 
 // 计算每个小图的宽度
-+ (CGFloat)widthWithTotalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
++ (CGFloat)itemWidthWithTotalWidth:(CGFloat)totalWidth itemCount:(NSUInteger)count separator:(CGFloat)separator {
     return (totalWidth - separator * 2) / 3.0;
 }
 
+// 默认间距下，默认宽高比，整个视图的高度
 + (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth {
-    return [self heightForContentImageCount:count totalWidth:totalWidth separator:[self defaultSeparator]];
+    return [self heightForItemCount:count totalWidth:totalWidth separator:[self defaultSeparator]];
 }
 
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
-   return [self heightForContentImageCount:count totalWidth:totalWidth separator:separator aspectRatio:[self defaultAspectRatio]];
+// 指定间距下，默认宽高比，整个视图的高度
++ (CGFloat)heightForItemCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator {
+    return [self heightForItemCount:count totalWidth:totalWidth separator:separator aspectRatio:[self defaultAspectRatio]];
 }
 
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
-    return [self heightForContentImageCount:count width:[self widthWithTotalWidth:totalWidth separator:separator] separator:separator aspectRatio:aspectRatio];
+// 计算视图的高度
++ (CGFloat)heightForItemCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
+    NSInteger totalRow = ceil(MIN(9, count) / 3.0); // 进位取整，总行数
+    CGFloat itemWidth = [self itemWidthWithTotalWidth:totalWidth itemCount:count separator:separator];
+    return (totalRow * (itemWidth / aspectRatio + separator) - separator);
 }
 
-// 计算整个视图的高度
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count width:(CGFloat)width separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio {
-    if (count > 0) {
-        NSInteger totalRow = ceil(MIN(9, count) / 3.0); // 进位取整，总行数
-        return ((totalRow) * (width / aspectRatio + separator) - separator);
-    }
-    return 0;
-}
+#pragma mark - 初始化方法
 
 - (instancetype)initWithFrame:(CGRect)frame {
     return [self initWithFrame:frame aspectRatio:[[self class] defaultAspectRatio]];
@@ -80,6 +83,8 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     }
     return self;
 }
+
+#pragma mark - 存档的支持
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
@@ -153,6 +158,22 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     return _reusableContentViews;
 }
 
+- (CGFloat)maxScaleForSingleImage {
+    if (_maxScaleForSingleImage > 0 && _maxScaleForSingleImage <= 1.0) {
+        return _maxScaleForSingleImage;
+    }
+    _maxScaleForSingleImage = 0.80;
+    return _maxScaleForSingleImage;
+}
+
+- (CGFloat)minScaleForSingleImage {
+    if (_minScaleForSingleImage > 0 && _minScaleForSingleImage <= 1.0) {
+        return _minScaleForSingleImage;
+    }
+    _minScaleForSingleImage = 0.40;
+    return _minScaleForSingleImage;
+}
+
 #pragma mark - 方法
 
 // 从重用池取一个 ImageView
@@ -170,7 +191,7 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 // 把 ImageView 加入重用池
 - (void)queueReusableContentView:(UIImageView *)imageView {
     imageView.hidden = YES;
-//    imageView.image = nil;
+    imageView.image = nil;
     [self.reusableContentViews addObject:imageView];
 }
 
@@ -186,17 +207,23 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
     [self.wrapperView addSubview:imageView];
     
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    // 距父视图的上边
     NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeTop) relatedBy:(NSLayoutRelationEqual) toItem:_wrapperView attribute:(NSLayoutAttributeTop) multiplier:1.0 constant:0];
     [_wrapperView addConstraint:top];
     objc_setAssociatedObject(imageView, kJWZSudokuViewTopConstraintToken, top, OBJC_ASSOCIATION_RETAIN);
     
+    // 距父视图的左边
     NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeLeading) relatedBy:(NSLayoutRelationEqual) toItem:_wrapperView attribute:(NSLayoutAttributeLeading) multiplier:1.0 constant:0];
     [_wrapperView addConstraint:leading];
     objc_setAssociatedObject(imageView, kJWZSudokuViewLeadingConstraintToken, leading, OBJC_ASSOCIATION_RETAIN);
     
-    NSLayoutConstraint *aspectRatio = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeWidth) relatedBy:(NSLayoutRelationEqual) toItem:imageView attribute:(NSLayoutAttributeHeight) multiplier:_aspectRatio constant:0];
-    [imageView addConstraint:aspectRatio];
+    // 高度约束
+    NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeHeight) relatedBy:(NSLayoutRelationEqual) toItem:nil attribute:(NSLayoutAttributeNotAnAttribute) multiplier:1.0 constant:0];
+    [imageView addConstraint:height];
+    objc_setAssociatedObject(imageView, kJWZSudokuViewHeightConstraintToken, height, OBJC_ASSOCIATION_RETAIN);
     
+    // 宽
     NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeWidth) relatedBy:(NSLayoutRelationEqual) toItem:nil attribute:(NSLayoutAttributeNotAnAttribute) multiplier:1.0 constant:0];
     [imageView addConstraint:width];
     objc_setAssociatedObject(imageView, kJWZSudokuViewWidthConstraintToken, width, OBJC_ASSOCIATION_RETAIN);
@@ -236,40 +263,127 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 
 // 添加网络图片，在图片下载前使用占位图
 - (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)image {
-    [self setContentWithCount:urls.count];
-    [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj sd_setImageWithURL:[NSURL URLWithString:urls[idx]] placeholderImage:image];
-    }];
+    NSInteger count = urls.count;
+    [self setContentWithCount:count];
+    if (count > 1) {
+        [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [obj sd_setImageWithURL:[NSURL URLWithString:urls[idx]] placeholderImage:image];
+        }];
+    } else {
+        [[[self contentViews] firstObject] sd_setImageWithURL:[NSURL URLWithString:[urls firstObject]] placeholderImage:image completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            if (image != nil) {
+                [self setNeedsLayout];
+            }
+        }];
+    }
     [self setNeedsLayout];
 }
 
-- (void)setContentWithModels:(NSArray<id<JWZSudokuViewModelRTF>> *)models placeholder:(UIImage *)image {
-    [self setContentWithCount:models.count];
-    [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        id<JWZSudokuViewModelRTF> model = [models objectAtIndex:idx];
-        NSURL *url = [NSURL URLWithString:[model valueForKey:[model imageUrlKey]]];
-        [obj sd_setImageWithURL:url placeholderImage:image];
-    }];
-    [self setNeedsLayout];
-}
+#pragma mark - 布局图片
 
 - (void)layoutImageViews {
-    CGFloat width = [[self class] widthWithTotalWidth:self.bounds.size.width separator:self.separator];
-    CGFloat height = width / _aspectRatio;
-    NSInteger count = _contentViews.count;
-    self.wrapperHeightConstraint.constant = [[self class] heightForContentImageCount:count width:width separator:_separator aspectRatio:_aspectRatio];
-    NSInteger rowSize = (count == 4 ? 2 : 3); // 四个的时候，显示田字格，其余的时候显示九宫格
-    [_contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        obj.tag = idx;
-        NSInteger row = idx / rowSize;
-        NSInteger col = idx % rowSize;
-        NSLayoutConstraint *constraint = objc_getAssociatedObject(obj, kJWZSudokuViewTopConstraintToken);
-        constraint.constant = (height  + _separator) * row;
-        constraint = objc_getAssociatedObject(obj, kJWZSudokuViewWidthConstraintToken);
-        constraint.constant = width;
-        constraint = objc_getAssociatedObject(obj, kJWZSudokuViewLeadingConstraintToken);
-        constraint.constant = (width + _separator) * col;
-    }];
+    NSInteger itemCount = _contentViews.count;
+    CGFloat totalWidth  = self.bounds.size.width;
+    if (itemCount > 1 || _optimizer == nil) {
+        CGFloat totalHeight = [[self class] heightForItemCount:itemCount totalWidth:totalWidth separator:self.separator aspectRatio:self.aspectRatio];
+        CGFloat itemWidth   = [[self class] itemWidthWithTotalWidth:totalWidth itemCount:itemCount separator:_separator];
+        CGFloat itemHeight  = itemWidth / _aspectRatio;
+        
+        // 每行小图的个数
+        NSInteger rowSize = [self rowSizeForItemCount:itemCount];
+        // 设置视图的高度
+        self.wrapperHeightConstraint.constant = totalHeight;
+        
+        NSLog(@"sodukuView: %f", totalHeight);
+        [_contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSInteger row = idx / rowSize;
+            NSInteger col = idx % rowSize;
+            [self setImageView:obj index:idx constraintsWithTop:(row * (itemHeight  + _separator)) leading:(col * (itemWidth + _separator)) width:itemWidth height:itemHeight];
+        }];
+    } else if (itemCount == 1) {
+        UIImageView *imageView = [_contentViews firstObject];
+        CGFloat realWidth      = 0, realHeight = 0;
+        CGRect rect            = CGRectZero;
+        CGFloat minWidth       = totalWidth * self.minScaleForSingleImage;
+        CGFloat maxWidth       = totalWidth * self.maxScaleForSingleImage;
+        CGFloat minHeight      = minWidth / self.aspectRatio;
+        CGFloat maxHeight      = maxWidth / self.aspectRatio;
+        
+        // 图片原始大小，通过代理方法获取
+        CGFloat oWidth = [_optimizer sudokuView:self widthForSingleImageView:imageView];
+        CGFloat oHeight = [_optimizer sudokuView:self heightForSingleImageView:imageView];
+        
+        // 图片原始宽高比
+        CGFloat oAspect   = oWidth / oHeight;
+        
+        // 宽高比最大值和最小值
+        CGFloat maxAspect = maxWidth / minHeight;
+        CGFloat minAspect = minWidth / maxHeight;
+        
+        if (oAspect >= minAspect && oAspect <= maxAspect) {
+            if (oAspect > 1) {
+                realWidth = maxWidth;
+                realHeight = maxWidth / oAspect;
+            } else {
+                realHeight = maxHeight;
+                realWidth = realHeight * oAspect;
+            }
+        } else {
+            if (oAspect < minAspect) {
+                realWidth = minWidth;
+                realHeight = maxHeight;
+                rect.origin.y = (oHeight - realHeight) / 2.0;
+            } else {
+                realHeight = minHeight;
+                realWidth = maxWidth;
+                rect.origin.x = (oWidth - realWidth) / 2.0;
+            }
+            rect.size.width = realWidth;
+            rect.size.height = realHeight;
+            NSLog(@"%@", NSStringFromCGRect(rect));
+            if (imageView.image != nil) {
+                imageView.image = [self imageFromImage:imageView.image inRect:rect];
+            }
+        }
+        NSLog(@"sodukuView: %f", realHeight);
+        self.wrapperHeightConstraint.constant = realHeight;
+        [self setImageView:imageView index:0 constraintsWithTop:0 leading:0 width:realWidth height:realHeight];
+    } else {
+        self.wrapperHeightConstraint.constant = 0;
+    }
+}
+
+- (void)setImageView:(UIImageView *)imageView index:(NSInteger)index constraintsWithTop:(CGFloat)top leading:(CGFloat)leading width:(CGFloat)width height:(CGFloat)height {
+    imageView.tag = index;
+    NSLayoutConstraint *constraint = objc_getAssociatedObject(imageView, kJWZSudokuViewTopConstraintToken);
+    constraint.constant = top;
+    constraint = objc_getAssociatedObject(imageView, kJWZSudokuViewLeadingConstraintToken);
+    constraint.constant = leading;
+    constraint = objc_getAssociatedObject(imageView, kJWZSudokuViewWidthConstraintToken);
+    constraint.constant = width;
+    constraint = objc_getAssociatedObject(imageView, kJWZSudokuViewHeightConstraintToken);
+    constraint.constant = height;
+}
+
+- (UIImage *)imageFromImage:(UIImage *)image inRect:(CGRect)rect {
+    CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage, rect);
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    return newImage;
+}
+
+// 四个的时候，显示田字格，其余的时候显示九宫格
+- (NSInteger)rowSizeForItemCount:(NSUInteger)count {
+    switch (count) {
+        case 1:
+            return 1;
+            break;
+        case 4:
+            return 2;
+        default:
+            return 3;
+            break;
+    }
 }
 
 - (void)layoutSubviews {
@@ -292,12 +406,12 @@ static void const *const kJWZSudokuViewTopConstraintToken = &kJWZSudokuViewTopCo
 }
 
 /*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
 
 - (void)didReceiveMemoryWarning {
     NSArray *array = _reusableContentViews;

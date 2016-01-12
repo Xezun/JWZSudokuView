@@ -10,14 +10,32 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol JWZSudokuViewDelegate, JWZSudokuViewModelRTF;
+@protocol JWZSudokuViewDelegate, JWZSudokuViewOptimizer;
 
 @interface JWZSudokuView : UIView
 
-// 非 autoLayout 布局时，可以使用以下方法获取高度
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)width;
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)width separator:(CGFloat)separator;
-+ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)width separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio;
+// 非 autoLayout 布局时，使用以下类方法获取高度
+
+// 默认间距
++ (CGFloat)defaultSeparator;
+
+// 默认宽高比
++ (CGFloat)defaultAspectRatio;
+
+// 默认间距下，每个小图的宽度
++ (CGFloat)itemWidthWithTotalWidth:(CGFloat)totalWidth itemCount:(NSUInteger)count;
+
+// 计算每个小图的宽度
++ (CGFloat)itemWidthWithTotalWidth:(CGFloat)totalWidth itemCount:(NSUInteger)count separator:(CGFloat)separator;
+
+// 默认间距下，默认宽高比，整个视图的高度
++ (CGFloat)heightForContentImageCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth;
+
+// 指定间距下，默认宽高比，整个视图的高度
++ (CGFloat)heightForItemCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator;
+
+// 计算视图的高度
++ (CGFloat)heightForItemCount:(NSUInteger)count totalWidth:(CGFloat)totalWidth separator:(CGFloat)separator aspectRatio:(CGFloat)aspectRatio;
 
 // 初始化方法
 - (instancetype)initWithFrame:(CGRect)frame aspectRatio:(CGFloat)aspectRatio;
@@ -27,6 +45,11 @@
 
 // 图片间的间隔，默认 3.0 。
 @property (nonatomic) CGFloat separator;
+
+// 单张图片的优化设置
+@property (nonatomic, weak) id<JWZSudokuViewOptimizer> optimizer; // 该代理方法返回 图片的实际高度
+@property (nonatomic) CGFloat maxScaleForSingleImage;  // 单张图片优化时，单张图片的最大宽度与视图最大宽度的比值，默认 0.8。
+@property (nonatomic) CGFloat minScaleForSingleImage;  // 最小比值，默认 0.4
 
 // 事件代理
 @property (nonatomic, weak) id<JWZSudokuViewDelegate> delegate;
@@ -41,12 +64,15 @@
 // 直接加载图片
 - (void)setContentWithImages:(NSArray<UIImage *> *)images;
 
-// 通过 model 加载图片
-// 如果图片 URL 是一个 model 的属性，该 model 遵循 JWZSudokuViewModelRTF 协议，可以使用下面的方法
-- (void)setContentWithModels:(NSArray<id<JWZSudokuViewModelRTF>> *)models placeholder:(UIImage *)image;
-
 @end
 
+@protocol JWZSudokuViewOptimizer <NSObject>
+
+@required
+- (CGFloat)sudokuView:(JWZSudokuView *)sudokuView heightForSingleImageView:(UIImageView *)imageView;
+- (CGFloat)sudokuView:(JWZSudokuView *)sudokuView widthForSingleImageView:(UIImageView *)imageView;
+
+@end
 
 @protocol JWZSudokuViewDelegate <NSObject>
 

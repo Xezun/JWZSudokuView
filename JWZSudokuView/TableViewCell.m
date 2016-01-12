@@ -20,4 +20,11 @@
     // Configure the view for the selected state
 }
 
+- (CGFloat)heightForTableView:(UITableView *)tableView {
+    self.frame = tableView.bounds;
+    [self layoutIfNeeded];
+    CGFloat height = CGRectGetMaxY(self.sudokuView.frame) + 10;
+    return (height > 40.0 ? height : 40.0);
+}
+
 @end

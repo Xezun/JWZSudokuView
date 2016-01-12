@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF4719821C4550DC002D8A1B /* 3.png in Resources */ = {isa = PBXBuildFile; fileRef = AF4719801C4550DC002D8A1B /* 3.png */; };
+		AF4719831C4550DC002D8A1B /* 4.png in Resources */ = {isa = PBXBuildFile; fileRef = AF4719811C4550DC002D8A1B /* 4.png */; };
 		AFB5CFB91C2DA6AB00BE2E0B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB5CFB81C2DA6AB00BE2E0B /* main.m */; };
 		AFB5CFBC1C2DA6AB00BE2E0B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB5CFBB1C2DA6AB00BE2E0B /* AppDelegate.m */; };
 		AFB5CFBF1C2DA6AB00BE2E0B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB5CFBE1C2DA6AB00BE2E0B /* ViewController.m */; };
@@ -37,6 +39,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AF4719801C4550DC002D8A1B /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3.png; sourceTree = "<group>"; };
+		AF4719811C4550DC002D8A1B /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4.png; sourceTree = "<group>"; };
 		AFB5CFB41C2DA6AB00BE2E0B /* JWZSudokuView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JWZSudokuView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFB5CFB81C2DA6AB00BE2E0B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AFB5CFBA1C2DA6AB00BE2E0B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -85,7 +89,6 @@
 		AFB5D00E1C2DC2BB00BE2E0B /* TableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
 		AFB5D00F1C2DC2BB00BE2E0B /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 		AFB5D0101C2DC2BB00BE2E0B /* TableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
-		AFB5D01C1C2E815900BE2E0B /* JWZSudokuViewModelRTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JWZSudokuViewModelRTF.h; sourceTree = "<group>"; };
 		AFB5D0211C2EBF4900BE2E0B /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
 		AFB5D0221C2EBF4900BE2E0B /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -134,6 +137,8 @@
 				AFB5CFC51C2DA6AB00BE2E0B /* LaunchScreen.storyboard */,
 				AFB5CFC81C2DA6AB00BE2E0B /* Info.plist */,
 				AFB5D0211C2EBF4900BE2E0B /* 1.png */,
+				AF4719801C4550DC002D8A1B /* 3.png */,
+				AF4719811C4550DC002D8A1B /* 4.png */,
 				AFB5D0221C2EBF4900BE2E0B /* 2.png */,
 				AFB5CFB71C2DA6AB00BE2E0B /* Supporting Files */,
 			);
@@ -193,7 +198,6 @@
 			children = (
 				AFB5D00B1C2DB5EF00BE2E0B /* JWZSudokuView.h */,
 				AFB5D00C1C2DB5EF00BE2E0B /* JWZSudokuView.m */,
-				AFB5D01C1C2E815900BE2E0B /* JWZSudokuViewModelRTF.h */,
 			);
 			path = JWZSudokuView;
 			sourceTree = "<group>";
@@ -260,7 +264,9 @@
 				AFB5CFC71C2DA6AB00BE2E0B /* LaunchScreen.storyboard in Resources */,
 				AFB5D0121C2DC2BB00BE2E0B /* TableViewCell.xib in Resources */,
 				AFB5CFC41C2DA6AB00BE2E0B /* Assets.xcassets in Resources */,
+				AF4719831C4550DC002D8A1B /* 4.png in Resources */,
 				AFB5CFC21C2DA6AB00BE2E0B /* Main.storyboard in Resources */,
+				AF4719821C4550DC002D8A1B /* 3.png in Resources */,
 				AFB5D0231C2EBF4900BE2E0B /* 1.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

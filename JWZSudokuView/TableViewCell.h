@@ -14,4 +14,6 @@
 @property (weak, nonatomic) IBOutlet JWZSudokuView *sudokuView;
 @property (weak, nonatomic) IBOutlet UILabel *label;
 
+- (CGFloat)heightForTableView:(UITableView *)tableView;
+
 @end
