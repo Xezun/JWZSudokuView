@@ -14,6 +14,8 @@ static void const *const kJWZSudokuViewWidthConstraintToken   = &kJWZSudokuViewW
 static void const *const kJWZSudokuViewHeightConstraintToken  = &kJWZSudokuViewHeightConstraintToken;// 高度
 static void const *const kJWZSudokuViewLeadingConstraintToken = &kJWZSudokuViewLeadingConstraintToken;// item 距左边
 static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewTopConstraintToken;// item 距右边
+static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewCGRectToken;
+
 
 @interface JWZSudokuWrapperView : UIView
 
@@ -262,19 +264,47 @@ static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewT
 }
 
 // 添加网络图片，在图片下载前使用占位图
-- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)image {
+- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder {
     NSInteger count = urls.count;
     [self setContentWithCount:count];
     if (count > 1) {
         [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj sd_setImageWithURL:[NSURL URLWithString:urls[idx]] placeholderImage:image];
+            [obj sd_setImageWithURL:[NSURL URLWithString:urls[idx]] placeholderImage:placeholder];
         }];
     } else {
-        [[[self contentViews] firstObject] sd_setImageWithURL:[NSURL URLWithString:[urls firstObject]] placeholderImage:image completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-            if (image != nil) {
-                [self setNeedsLayout];
+        UIImageView *imageView = [[self contentViews] firstObject];
+        NSString *url = [urls firstObject];
+        NSString *cacheUrl = nil;
+        // 根据 url 构造 cacheUrl
+        if ([url containsString:@"?"]) {
+            cacheUrl = [url stringByAppendingString:@"&JWZSudokuViewSingleImageCacheUrl"];
+        } else {
+            cacheUrl = [url stringByAppendingString:@"?JWZSudokuViewSingleImageCacheUrl"];
+        }
+        // 从缓存中获取
+        SDImageCache *imageCache = [SDImageCache sharedImageCache];
+        UIImage *image = [imageCache imageFromDiskCacheForKey:cacheUrl];
+        if (image != nil) {
+            // 如果获取到了，直接赋值
+            imageView.image = image;
+        } else {
+            // 如果没有获取到，判断是否需要裁剪
+            NSValue *rectValue = objc_getAssociatedObject(imageView, kJWZSudokuViewCGRectToken);
+            if (rectValue != nil) {
+                // 需要裁剪
+                [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:image completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                    if (image != nil) {
+                        CGRect rect = [rectValue CGRectValue];
+                        UIImage *newImage = [self imageFromImage:image inRect:rect];
+                        [imageCache storeImage:newImage forKey:cacheUrl];  // 将处理后的图片缓存起来
+                        objc_setAssociatedObject(imageView, kJWZSudokuViewCGRectToken, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                    }
+                }];
+            } else {
+                // 不需要裁剪
+                [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:placeholder];
             }
-        }];
+        }
     }
     [self setNeedsLayout];
 }
@@ -339,6 +369,8 @@ static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewT
             rect.size.height = realHeight;
             if (imageView.image != nil) {
                 imageView.image = [self imageFromImage:imageView.image inRect:rect];
+            } else {
+                objc_setAssociatedObject(imageView, kJWZSudokuViewCGRectToken, [NSValue valueWithCGRect:rect], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             }
         }
         self.wrapperHeightConstraint.constant = realHeight;
