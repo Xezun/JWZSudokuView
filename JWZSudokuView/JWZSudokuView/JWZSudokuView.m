@@ -288,13 +288,10 @@ static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewT
         CGFloat totalHeight = [[self class] heightForItemCount:itemCount totalWidth:totalWidth separator:self.separator aspectRatio:self.aspectRatio];
         CGFloat itemWidth   = [[self class] itemWidthWithTotalWidth:totalWidth itemCount:itemCount separator:_separator];
         CGFloat itemHeight  = itemWidth / _aspectRatio;
-        
         // 每行小图的个数
         NSInteger rowSize = [self rowSizeForItemCount:itemCount];
         // 设置视图的高度
         self.wrapperHeightConstraint.constant = totalHeight;
-        
-        NSLog(@"sodukuView: %f", totalHeight);
         [_contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSInteger row = idx / rowSize;
             NSInteger col = idx % rowSize;
@@ -340,12 +337,10 @@ static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewT
             }
             rect.size.width = realWidth;
             rect.size.height = realHeight;
-            NSLog(@"%@", NSStringFromCGRect(rect));
             if (imageView.image != nil) {
                 imageView.image = [self imageFromImage:imageView.image inRect:rect];
             }
         }
-        NSLog(@"sodukuView: %f", realHeight);
         self.wrapperHeightConstraint.constant = realHeight;
         [self setImageView:imageView index:0 constraintsWithTop:0 leading:0 width:realWidth height:realHeight];
     } else {
