@@ -73,10 +73,10 @@ NSArray *constraints2 = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[su
 #### 其它说明
 
 - 你需要做的仅仅就是上面这些，就可以轻松实现一个九宫格图片布局。
-- 鉴于 SDWebImage 已经非常常用，除此以外整个类都非常简单，非常轻量级。
+- 鉴于 SDWebImage 已经非常常用，因此引入本类几乎不会增加工程的大小。
 - 而且其中逻辑也不是很复杂，如果你想自定义样式，可以轻松地修改源代码实现。
 - 另外，为了优化在 UITableViewCell 中的使用，JWZSudokuView 使用了重用机制，避免重复创建 UIImageView。
 - 重用池只会在重用的时候创建，并不会增加普通使用时的资源开销。
 - 重用机制可能会让内存吃紧，实际上影响很小，即便如此 JWZSudokuView 也做了相关的优化。
-- 当收到内存警告时，JWZSudokuView 将销毁重用池以及重用池里的对象。
+- 当收到内存警告时，JWZSudokuView 将释放重用池以及重用池里的对象。
 
