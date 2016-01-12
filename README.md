@@ -10,8 +10,10 @@
 
 ## Demo截图
 
-<img src="JWZSudokuView/1.png" width=375 height=667 alt="Demo截图"></img>
-<img src="JWZSudokuView/2.png" width=375 height=667 alt="Demo截图"></img>
+<img src="JWZSudokuView/1.png" width=187.5 height=333.5 alt="Demo截图"></img>
+<img src="JWZSudokuView/2.png" width=187.5 height=333.5 alt="Demo截图"></img>
+<img src="JWZSudokuView/3.png" width=187.5 height=333.5 alt="Demo截图"></img>
+<img src="JWZSudokuView/4.png" width=187.5 height=333.5 alt="Demo截图"></img>
 
 #### 在普通布局中使用
 
@@ -38,6 +40,8 @@ nextView.frame = CGRectMake(CGRectGetMinX(sudokuView.frame),
                             CGRectGetWidth(sudokuView.frame), 
                             CGRectGetHeight(sudokuView.frame));
 [superView addSubview:nextView];
+
+// 对于单张图片的优化，首先需要知道图片的宽和高，对于基于 frame 的布局方法，已知了高度可以轻松算出实际高度，在此不述。
 
 ```
 
@@ -67,6 +71,9 @@ NSArray *constraints2 = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[su
 [superView addConstraints:constraints2];
 
 [sudokuView setContentWithImageUrls:imageUrls];
+
+//  对于单张图片的优化，首先需要知道图片的宽和高，通过代理方法，将单张图片的宽和高传给 JWZSudokuView。
+
 
 ```
 
