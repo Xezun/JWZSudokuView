@@ -274,13 +274,8 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
     } else {
         UIImageView *imageView = [[self contentViews] firstObject];
         NSString *url = [urls firstObject];
-        NSString *cacheUrl = nil;
         // 根据 url 构造 cacheUrl
-        if ([url containsString:@"?"]) {
-            cacheUrl = [url stringByAppendingString:@"&JWZSudokuViewSingleImageCacheUrl"];
-        } else {
-            cacheUrl = [url stringByAppendingString:@"?JWZSudokuViewSingleImageCacheUrl"];
-        }
+        NSString *cacheUrl = [url stringByAppendingString:@"?JWZSudokuViewSingleImageCacheUrl"];
         // 从缓存中获取
         SDImageCache *imageCache = [SDImageCache sharedImageCache];
         UIImage *image = [imageCache imageFromDiskCacheForKey:cacheUrl];
