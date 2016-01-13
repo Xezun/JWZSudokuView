@@ -283,22 +283,26 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
             // 如果获取到了，直接赋值
             imageView.image = image;
         } else {
-            // 如果没有获取到，判断是否需要裁剪
-            NSValue *rectValue = objc_getAssociatedObject(imageView, kJWZSudokuViewCGRectToken);
-            if (rectValue != nil) {
-                // 需要裁剪
-                [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:image completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-                    if (image != nil) {
-                        CGRect rect = [rectValue CGRectValue];
-                        UIImage *newImage = [self imageFromImage:image inRect:rect];
-                        [imageCache storeImage:newImage forKey:cacheUrl];  // 将处理后的图片缓存起来
+            UIImageView *imageView = [[self contentViews] firstObject];
+            NSString *url = [urls firstObject];
+            [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:placeholder completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                if (image != nil) {
+                    NSValue *rectValue = objc_getAssociatedObject(imageView, kJWZSudokuViewCGRectToken);
+                    CGRect rect = [rectValue CGRectValue];
+                    if (!CGRectIsEmpty(rect)) {
+                        NSString *cacheUrl = [url stringByAppendingString:@"?JWZSudokuViewSingleImageCacheUrl"];
+                        SDImageCache *imageCache = [SDImageCache sharedImageCache];
+                        UIImage *newImage = [imageCache imageFromDiskCacheForKey:cacheUrl];
+                        if (newImage == nil) {
+                            // NSLog(@"从网络下载后，裁剪图片");
+                            newImage = [self imageFromImage:image inRect:rect];
+                            [imageCache storeImage:newImage forKey:cacheUrl];
+                        }
+                        imageView.image = newImage;
                         objc_setAssociatedObject(imageView, kJWZSudokuViewCGRectToken, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
                     }
-                }];
-            } else {
-                // 不需要裁剪
-                [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:placeholder];
-            }
+                }
+            }];
         }
     }
     [self setNeedsLayout];
@@ -332,8 +336,15 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
         CGFloat maxHeight      = maxWidth / self.aspectRatio;
         
         // 图片原始大小，通过代理方法获取
-        CGFloat oWidth = [_optimizer sudokuView:self widthForSingleImageView:imageView];
-        CGFloat oHeight = [_optimizer sudokuView:self heightForSingleImageView:imageView];
+        UIImage *image = imageView.image;
+        CGFloat oWidth = 0, oHeight = 0;
+        if (image == nil) {
+            oWidth = [_optimizer sudokuView:self widthForSingleImageView:imageView];
+            oHeight = [_optimizer sudokuView:self heightForSingleImageView:imageView];
+        } else {
+            oWidth = image.size.width;
+            oHeight = image.size.height;
+        }
         
         // 图片原始宽高比
         CGFloat oAspect   = oWidth / oHeight;
@@ -362,9 +373,7 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
             }
             rect.size.width = realWidth;
             rect.size.height = realHeight;
-            if (imageView.image != nil) {
-                imageView.image = [self imageFromImage:imageView.image inRect:rect];
-            } else {
+            if (image == nil) {
                 objc_setAssociatedObject(imageView, kJWZSudokuViewCGRectToken, [NSValue valueWithCGRect:rect], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             }
         }
