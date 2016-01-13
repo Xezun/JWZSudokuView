@@ -283,23 +283,20 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
             // 如果获取到了，直接赋值
             imageView.image = image;
         } else {
+            // 从缓存中没有获取到，网络请求
             UIImageView *imageView = [[self contentViews] firstObject];
             NSString *url = [urls firstObject];
             [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:placeholder completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
                 if (image != nil) {
+                    // 取出绑定的裁剪区域
                     NSValue *rectValue = objc_getAssociatedObject(imageView, kJWZSudokuViewCGRectToken);
                     CGRect rect = [rectValue CGRectValue];
                     if (!CGRectIsEmpty(rect)) {
-                        NSString *cacheUrl = [url stringByAppendingString:@"?JWZSudokuViewSingleImageCacheUrl"];
-                        SDImageCache *imageCache = [SDImageCache sharedImageCache];
-                        UIImage *newImage = [imageCache imageFromDiskCacheForKey:cacheUrl];
-                        if (newImage == nil) {
-                            // NSLog(@"从网络下载后，裁剪图片");
-                            newImage = [self imageFromImage:image inRect:rect];
+                        UIImage *newImage = [self imageFromImage:image inRect:rect];
+                        if (newImage != nil) {
                             [imageCache storeImage:newImage forKey:cacheUrl];
+                            imageView.image = newImage;
                         }
-                        imageView.image = newImage;
-                        objc_setAssociatedObject(imageView, kJWZSudokuViewCGRectToken, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
                     }
                 }
             }];
