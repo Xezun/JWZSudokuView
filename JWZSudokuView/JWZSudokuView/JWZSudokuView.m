@@ -10,12 +10,19 @@
 #import <objc/runtime.h>
 #import "UIImageView+WebCache.h"
 
+static inline CGFloat JWZAspectRatio(CGFloat width, CGFloat height) {
+    return width / height;
+}
+
+static inline CGFloat JWZAspectRatioFromCGSize(CGSize size) {
+    return JWZAspectRatio(size.width, size.height);
+}
+
 static void const *const kJWZSudokuViewWidthConstraintToken   = &kJWZSudokuViewWidthConstraintToken;// 宽度
 static void const *const kJWZSudokuViewHeightConstraintToken  = &kJWZSudokuViewHeightConstraintToken;// 高度
 static void const *const kJWZSudokuViewLeadingConstraintToken = &kJWZSudokuViewLeadingConstraintToken;// item 距左边
 static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewTopConstraintToken;// item 距右边
-static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewCGRectToken;
-
+static void const *const kJWZSudokuViewUrlStringToken          = &kJWZSudokuViewUrlStringToken;// item 距右边
 
 @interface JWZSudokuWrapperView : UIView
 
@@ -80,7 +87,6 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
 - (instancetype)initWithFrame:(CGRect)frame aspectRatio:(CGFloat)aspectRatio {
     self = [super initWithFrame:frame];
     if (self != nil) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
         _aspectRatio = aspectRatio;
     }
     return self;
@@ -176,6 +182,13 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
     return _minScaleForSingleImage;
 }
 
+- (void)setOptimizer:(id<JWZSudokuViewOptimizer>)optimizer {
+    if (_optimizer != optimizer) {
+        _optimizer = optimizer;
+        _optimizeForSingleImage = (_optimizer != nil);
+    }
+}
+
 #pragma mark - 方法
 
 // 从重用池取一个 ImageView
@@ -251,11 +264,20 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
 
 // 添加图片
 - (void)setContentWithImages:(NSArray<UIImage *> *)images {
+    NSInteger count = images.count;
     [self setContentWithCount:images.count];
-    [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        obj.image = images[idx];
-    }];
+    if (count > 0) {
+        CGFloat cutAspect = ((count == 1 && _optimizeForSingleImage) ? JWZAspectRatioFromCGSize(images.firstObject.size) : self.aspectRatio);
+        [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            obj.image = [self imageFromImage:images[idx] cutAspect:cutAspect];
+        }];
+    }
     [self setNeedsLayout];
+}
+
+- (void)setContentWithImages:(NSArray<UIImage *> *)images optimizeForSingleImage:(BOOL)optimize {
+    _optimizeForSingleImage = optimize;
+    [self setContentWithImages:images];
 }
 
 // 添加网络图片
@@ -267,42 +289,47 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
 - (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder {
     NSInteger count = urls.count;
     [self setContentWithCount:count];
-    if (count > 1) {
-        [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj sd_setImageWithURL:[NSURL URLWithString:urls[idx]] placeholderImage:placeholder];
-        }];
-    } else {
-        UIImageView *imageView = [[self contentViews] firstObject];
-        NSString *url = [urls firstObject];
-        // 根据 url 构造 cacheUrl
-        NSString *cacheUrl = [url stringByAppendingString:@"?JWZSudokuViewSingleImageCacheUrl"];
-        // 从缓存中获取
+    if (count > 0) {
+        // 先设置图片，后设置的代理，将使单图优化无效
         SDImageCache *imageCache = [SDImageCache sharedImageCache];
-        UIImage *image = [imageCache imageFromDiskCacheForKey:cacheUrl];
-        if (image != nil) {
-            // 如果获取到了，直接赋值
-            imageView.image = image;
-        } else {
-            // 从缓存中没有获取到，网络请求
-            UIImageView *imageView = [[self contentViews] firstObject];
-            NSString *url = [urls firstObject];
-            [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:placeholder completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+        CGFloat cutAspect = (count == 1 ? [self aspectRatioForSingleImageView:_contentViews.firstObject] : self.aspectRatio);
+        [self.contentViews enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSString *url          = [urls objectAtIndex:idx];
+            NSString *cacheUrl     = [url stringByAppendingString:@"?com.JWZ.sudokuView.cache"];
+            UIImage *cacheImage    = [imageCache imageFromDiskCacheForKey:cacheUrl];
+            if (cacheImage != nil) {
+                obj.image = [self imageFromImage:cacheImage cutAspect:cutAspect];
+            } else {
+                UIImage *image = [imageCache imageFromDiskCacheForKey:url];
                 if (image != nil) {
-                    // 取出绑定的裁剪区域
-                    NSValue *rectValue = objc_getAssociatedObject(imageView, kJWZSudokuViewCGRectToken);
-                    CGRect rect = [rectValue CGRectValue];
-                    if (!CGRectIsEmpty(rect)) {
-                        UIImage *newImage = [self imageFromImage:image inRect:rect];
-                        if (newImage != nil) {
-                            [imageCache storeImage:newImage forKey:cacheUrl];
-                            imageView.image = newImage;
-                        }
+                    UIImage *newImage = [self imageFromImage:image cutAspect:cutAspect];
+                    obj.image = newImage;
+                    if (newImage != image) {
+                        [imageCache storeImage:newImage forKey:cacheUrl];
                     }
+                } else {
+                    obj.image = [self imageFromImage:placeholder cutAspect:cutAspect];
+                    [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:url] options:(0) progress:NULL completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                        if (image != nil) {
+                            UIImage *newImage = [self imageFromImage:image cutAspect:cutAspect];
+                            if (newImage != image) {
+                                [imageCache storeImage:newImage forKey:cacheUrl];
+                            }
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                obj.image = newImage;
+                            });
+                        }
+                    }];
                 }
-            }];
-        }
+            }
+        }];
     }
     [self setNeedsLayout];
+}
+
+- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder optimizer:(id<JWZSudokuViewOptimizer>)optimizer {
+    [self setOptimizer:optimizer];
+    [self setContentWithImageUrls:urls placeholder:placeholder];
 }
 
 #pragma mark - 布局图片
@@ -310,7 +337,7 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
 - (void)layoutImageViews {
     NSInteger itemCount = _contentViews.count;
     CGFloat totalWidth  = self.bounds.size.width;
-    if (itemCount > 1 || _optimizer == nil) {
+    if (itemCount > 1 || !_optimizeForSingleImage) {
         CGFloat totalHeight = [[self class] heightForItemCount:itemCount totalWidth:totalWidth separator:self.separator aspectRatio:self.aspectRatio];
         CGFloat itemWidth   = [[self class] itemWidthWithTotalWidth:totalWidth itemCount:itemCount separator:_separator];
         CGFloat itemHeight  = itemWidth / _aspectRatio;
@@ -325,62 +352,21 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
         }];
     } else if (itemCount == 1) {
         UIImageView *imageView = [_contentViews firstObject];
-        CGFloat realWidth      = 0, realHeight = 0;
-        CGRect rect            = CGRectZero;
-        CGFloat minWidth       = totalWidth * self.minScaleForSingleImage;
-        CGFloat maxWidth       = totalWidth * self.maxScaleForSingleImage;
-        CGFloat minHeight      = minWidth / self.aspectRatio;
-        CGFloat maxHeight      = maxWidth / self.aspectRatio;
-        
-        // 图片原始大小，通过代理方法获取
-        UIImage *image = imageView.image;
-        CGFloat oWidth = 0, oHeight = 0;
-        if (image == nil) {
-            oWidth = [_optimizer sudokuView:self widthForSingleImageView:imageView];
-            oHeight = [_optimizer sudokuView:self heightForSingleImageView:imageView];
+        CGFloat aspectRatio = 0;
+        if (_optimizer != nil) {
+            aspectRatio = [self aspectRatioForSingleImageView:imageView];
         } else {
-            oWidth = image.size.width;
-            oHeight = image.size.height;
+            aspectRatio = JWZAspectRatioFromCGSize(imageView.image.size);
         }
-        
-        // 图片原始宽高比
-        CGFloat oAspect   = oWidth / oHeight;
-        
-        // 宽高比最大值和最小值
-        CGFloat maxAspect = maxWidth / minHeight;
-        CGFloat minAspect = minWidth / maxHeight;
-        
-        if (oAspect >= minAspect && oAspect <= maxAspect) {
-            if (oAspect > 1) {
-                realWidth = maxWidth;
-                realHeight = maxWidth / oAspect;
-            } else {
-                realHeight = maxHeight;
-                realWidth = realHeight * oAspect;
-            }
-        } else {
-            if (oAspect < minAspect) {
-                realWidth = minWidth;
-                realHeight = maxHeight;
-                rect.origin.y = (oHeight - realHeight) / 2.0;
-            } else {
-                realHeight = minHeight;
-                realWidth = maxWidth;
-                rect.origin.x = (oWidth - realWidth) / 2.0;
-            }
-            rect.size.width = realWidth;
-            rect.size.height = realHeight;
-            if (image == nil) {
-                objc_setAssociatedObject(imageView, kJWZSudokuViewCGRectToken, [NSValue valueWithCGRect:rect], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
-        }
-        self.wrapperHeightConstraint.constant = realHeight;
-        [self setImageView:imageView index:0 constraintsWithTop:0 leading:0 width:realWidth height:realHeight];
+        CGSize displaySize  = [self displaySizeForSingleImageView:imageView totalWidth:totalWidth aspectRatio:aspectRatio];
+        self.wrapperHeightConstraint.constant = displaySize.height;
+        [self setImageView:imageView index:0 constraintsWithTop:0 leading:0 width:displaySize.width height:displaySize.height];
     } else {
         self.wrapperHeightConstraint.constant = 0;
     }
 }
 
+// 设置 imageView 约束的方法
 - (void)setImageView:(UIImageView *)imageView index:(NSInteger)index constraintsWithTop:(CGFloat)top leading:(CGFloat)leading width:(CGFloat)width height:(CGFloat)height {
     imageView.tag = index;
     NSLayoutConstraint *constraint = objc_getAssociatedObject(imageView, kJWZSudokuViewTopConstraintToken);
@@ -393,10 +379,72 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
     constraint.constant = height;
 }
 
-- (UIImage *)imageFromImage:(UIImage *)image inRect:(CGRect)rect {
-    CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage, rect);
+// 单张图片的时候，计算图片实际显示的大小
+- (CGSize)displaySizeForSingleImageView:(UIImageView *)imageView totalWidth:(CGFloat)totalWidth aspectRatio:(CGFloat)aspectRatio {
+    CGFloat maxWidth   = totalWidth * self.maxScaleForSingleImage;
+    CGFloat maxHeight  = maxWidth;
+    if (aspectRatio > 1) {
+        return CGSizeMake(maxWidth, maxWidth / aspectRatio);
+    } else {
+        return CGSizeMake(maxHeight * aspectRatio, maxHeight);
+    }
+}
+
+// 计算单图模式下，获取图片的宽高比
+- (CGFloat)aspectRatioForSingleImageView:(UIImageView *)imageView {
+    if (_optimizeForSingleImage && _optimizer != nil) {
+        // 图片原始大小，通过代理方法获取
+        CGFloat oWidth = 0, oHeight = 0;
+        oWidth  = [_optimizer sudokuView:self widthForSingleImageView:imageView];
+        oHeight = [_optimizer sudokuView:self heightForSingleImageView:imageView];
+        // 图片原始宽高比
+        CGFloat oAspect   = JWZAspectRatio(oWidth, oHeight);
+        // 宽高比最大值和最小值
+        CGFloat maxAspect = self.maxScaleForSingleImage / self.minScaleForSingleImage;
+        CGFloat minAspect = 1.0 / maxAspect;
+        if (oAspect > maxAspect) {
+            return maxAspect;
+        } else if (oAspect < minAspect) {
+            return minAspect;
+        }
+        return oAspect;
+    } else {
+        return self.aspectRatio;
+    }
+}
+
+// 从图片中，截出出某一比例的图片
+- (UIImage *)imageFromImage:(UIImage *)image cutAspect:(CGFloat)cutAspect {
+    if (image == nil) {
+        return nil;
+    }
+    CGSize imageSize = image.size;
+    CGFloat imageAspect = JWZAspectRatioFromCGSize(imageSize);
+    if (ABS(imageAspect - cutAspect) < 0.1) {
+        return image;
+    }
+    CGFloat scale = image.scale;
+    imageSize.width *= scale;
+    imageSize.height *= scale;  // 裁剪图片是用的是像素，要把点转换成像素
+    CGRect cutRect = CGRectZero;
+    if (cutAspect < imageAspect) {
+        cutRect.size.height = imageSize.height;
+        cutRect.size.width = cutRect.size.height * cutAspect;
+        cutRect.origin.x = (imageSize.width - cutRect.size.width) / 2.0;
+    } else {
+        cutRect.size.width = imageSize.width;
+        cutRect.size.height = cutRect.size.width / cutAspect;
+        cutRect.origin.y = (imageSize.height - cutRect.size.height) / 2.0;
+    }
+    CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage, cutRect);
     UIImage *newImage = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
+    // 缓存起来
+    NSString *cacheUrl = objc_getAssociatedObject(image, kJWZSudokuViewUrlStringToken);
+    if (cacheUrl != nil) {
+        SDImageCache *imageCache = [SDImageCache sharedImageCache];
+        [imageCache storeImage:newImage forKey:cacheUrl];
+    }
     return newImage;
 }
 
@@ -441,16 +489,9 @@ static void const *const kJWZSudokuViewCGRectToken            = &kJWZSudokuViewC
  }
  */
 
-- (void)didReceiveMemoryWarning {
-    NSArray *array = _reusableContentViews;
-    _reusableContentViews = nil;
-    [array enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj removeFromSuperview];
-    }];
-}
-
 @end
 
+#pragma mark - Sudoku Wrapper View
 
 @implementation JWZSudokuWrapperView
 

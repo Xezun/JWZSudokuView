@@ -14,8 +14,6 @@
 
 @interface JWZSudokuView : UIView
 
-// 非 autoLayout 布局时，使用以下类方法获取高度
-
 // 默认间距
 + (CGFloat)defaultSeparator;
 
@@ -47,9 +45,11 @@
 @property (nonatomic) CGFloat separator;
 
 // 单张图片的优化设置
-@property (nonatomic, weak) id<JWZSudokuViewOptimizer> optimizer; // 该代理方法返回 图片的实际高度
+@property (nonatomic, weak, readonly) id<JWZSudokuViewOptimizer> optimizer; // 该代理方法返回 图片的实际高度
 @property (nonatomic) CGFloat maxScaleForSingleImage;  // 单张图片优化时，单张图片的最大宽度与视图最大宽度的比值，默认 0.8。
 @property (nonatomic) CGFloat minScaleForSingleImage;  // 最小比值，默认 0.4
+
+@property (nonatomic, readonly) BOOL optimizeForSingleImage;
 
 // 事件代理
 @property (nonatomic, weak) id<JWZSudokuViewDelegate> delegate;
@@ -57,12 +57,14 @@
 // 返回正在显示的图片
 - (NSArray<UIImageView *> *)allImageViews;
 
-// 加载网络图片
-- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls;
-- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)image;
-
 // 直接加载图片
 - (void)setContentWithImages:(NSArray<UIImage *> *)images;
+- (void)setContentWithImages:(NSArray<UIImage *> *)images optimizeForSingleImage:(BOOL)optimize;
+
+// 加载网络图片
+- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls;
+- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder;
+- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder optimizer:(id<JWZSudokuViewOptimizer>)optimizer;
 
 @end
 

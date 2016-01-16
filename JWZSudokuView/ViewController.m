@@ -84,8 +84,7 @@
     }
     
     JWZCellModel *model = [self.dataArray objectAtIndex:indexPath.row];
-    [cell.sudokuView setContentWithImageUrls:model.urls];
-    cell.sudokuView.optimizer = self;
+    [cell.sudokuView setContentWithImageUrls:model.urls placeholder:nil optimizer:self];
     cell.label.text = [NSString stringWithFormat:@"%ld 张图片", indexPath.row];
     
     model.cellHeight = [cell heightForTableView:tableView];
@@ -100,11 +99,11 @@
 }
 
 - (CGFloat)sudokuView:(JWZSudokuView *)sudokuView widthForSingleImageView:(UIImageView *)imageView {
-    return 1280 / [UIScreen mainScreen].scale;
+    return 1280;
 }
 
 - (CGFloat)sudokuView:(JWZSudokuView *)sudokuView heightForSingleImageView:(UIImageView *)imageView {
-    return 853 / [UIScreen mainScreen].scale;
+    return 853;
 }
 
 - (void)didReceiveMemoryWarning {
