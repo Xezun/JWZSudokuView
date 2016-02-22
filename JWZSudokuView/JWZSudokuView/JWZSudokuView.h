@@ -10,6 +10,8 @@
 
 #import <UIKit/UIKit.h>
 
+static inline CGFloat JWZAspectRatio(CGFloat width, CGFloat height);
+
 @protocol JWZSudokuViewDelegate, JWZSudokuViewOptimizer;
 
 @interface JWZSudokuView : UIView
@@ -39,17 +41,15 @@
 - (instancetype)initWithFrame:(CGRect)frame aspectRatio:(CGFloat)aspectRatio;
 
 // aspectRatio 是 宽/高 的值，默认 1.0。
-@property (nonatomic, readonly) CGFloat aspectRatio;
+@property (nonatomic) CGFloat aspectRatio;
 
 // 图片间的间隔，默认 3.0 。
 @property (nonatomic) CGFloat separator;
 
 // 单张图片的优化设置
-@property (nonatomic, weak, readonly) id<JWZSudokuViewOptimizer> optimizer; // 该代理方法返回 图片的实际高度
+@property (nonatomic, weak) id<JWZSudokuViewOptimizer> optimizer; // 该代理方法返回 图片的实际高度
 @property (nonatomic) CGFloat maxScaleForSingleImage;  // 单张图片优化时，单张图片的最大宽度与视图最大宽度的比值，默认 0.8。
 @property (nonatomic) CGFloat minScaleForSingleImage;  // 最小比值，默认 0.4
-
-@property (nonatomic, readonly) BOOL optimizeForSingleImage;
 
 // 事件代理
 @property (nonatomic, weak) id<JWZSudokuViewDelegate> delegate;
@@ -59,12 +59,10 @@
 
 // 直接加载图片
 - (void)setContentWithImages:(NSArray<UIImage *> *)images;
-- (void)setContentWithImages:(NSArray<UIImage *> *)images optimizeForSingleImage:(BOOL)optimize;
 
 // 加载网络图片
 - (void)setContentWithImageUrls:(NSArray<NSString *> *)urls;
 - (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder;
-- (void)setContentWithImageUrls:(NSArray<NSString *> *)urls placeholder:(UIImage *)placeholder optimizer:(id<JWZSudokuViewOptimizer>)optimizer;
 
 @end
 

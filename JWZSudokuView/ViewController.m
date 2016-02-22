@@ -84,7 +84,8 @@
     }
     
     JWZCellModel *model = [self.dataArray objectAtIndex:indexPath.row];
-    [cell.sudokuView setContentWithImageUrls:model.urls placeholder:nil optimizer:self];
+    cell.sudokuView.optimizer = self;
+    [cell.sudokuView setContentWithImageUrls:model.urls placeholder:nil];
     cell.label.text = [NSString stringWithFormat:@"%ld 张图片", indexPath.row];
     
     model.cellHeight = [cell heightForTableView:tableView];
