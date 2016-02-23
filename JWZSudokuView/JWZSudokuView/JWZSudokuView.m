@@ -228,22 +228,22 @@ static void const *const kJWZSudokuViewTopConstraintToken     = &kJWZSudokuViewT
     // 距父视图的上边
     NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeTop) relatedBy:(NSLayoutRelationEqual) toItem:_wrapperView attribute:(NSLayoutAttributeTop) multiplier:1.0 constant:0];
     [_wrapperView addConstraint:top];
-    objc_setAssociatedObject(imageView, kJWZSudokuViewTopConstraintToken, top, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(imageView, kJWZSudokuViewTopConstraintToken, top, OBJC_ASSOCIATION_ASSIGN);
 
     // 距父视图的左边
     NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeLeading) relatedBy:(NSLayoutRelationEqual) toItem:_wrapperView attribute:(NSLayoutAttributeLeading) multiplier:1.0 constant:0];
     [_wrapperView addConstraint:leading];
-    objc_setAssociatedObject(imageView, kJWZSudokuViewLeadingConstraintToken, leading, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(imageView, kJWZSudokuViewLeadingConstraintToken, leading, OBJC_ASSOCIATION_ASSIGN);
     
     // 高度约束
     NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeHeight) relatedBy:(NSLayoutRelationEqual) toItem:nil attribute:(NSLayoutAttributeNotAnAttribute) multiplier:1.0 constant:0];
     [imageView addConstraint:height];
-    objc_setAssociatedObject(imageView, kJWZSudokuViewHeightConstraintToken, height, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(imageView, kJWZSudokuViewHeightConstraintToken, height, OBJC_ASSOCIATION_ASSIGN);
     
     // 宽
     NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:imageView attribute:(NSLayoutAttributeWidth) relatedBy:(NSLayoutRelationEqual) toItem:nil attribute:(NSLayoutAttributeNotAnAttribute) multiplier:1.0 constant:0];
     [imageView addConstraint:width];
-    objc_setAssociatedObject(imageView, kJWZSudokuViewWidthConstraintToken, width, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(imageView, kJWZSudokuViewWidthConstraintToken, width, OBJC_ASSOCIATION_ASSIGN);
     return imageView;
 }
 
